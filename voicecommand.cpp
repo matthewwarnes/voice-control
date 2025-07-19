@@ -11,7 +11,7 @@ static const char *optString = "I:l:d:D:psb::c::v::ei::q::t:k:r:f:h?";
 inline void ProcessVoice(FILE *cmd, VoiceCommand &vc, char *message) {
     printf("Found audio\n");
     vc.Speak(vc.response);
-    string command = "./speech-recog.sh";
+    string command = "speech-recog.sh";
     if(vc.differentHW) {
         command += " -D ";
         command += vc.recordHW;
