@@ -1,17 +1,19 @@
 
-all:
-	cd DownloadController; make
-	cd Imaging; make
-	cd TextCommand; make
-	cd VoiceCommand; make
-	cd Youtube; make
+LIBS := -lcurl -lboost_regex
+FLAGS := -g -Wall
+
+all: voicecommand
+
+#Compilers
+voicecommand: voicecommand.cpp voicecommand.h
+	g++ -o $@ $< $(FLAGS) $(LIBS)
 
 clean:
-	cd DownloadController; make clean
-	cd Imaging; make clean
-	cd TextCommand; make clean
-	cd VoiceCommand; make clean
-	cd Youtube; make clean
+	rm *.o voicecommand
 
-install:
-	cd Install; ./InstallAUISuite.sh
+install: google speech-recog.sh voicecommand tts
+	install google /usr/bin/google
+	install tts /usr/bin/tts
+	install speech-recog.sh /usr/bin/speech-recog.sh
+	install voicecommand /usr/bin/voicecommand
+	./installconf.sh

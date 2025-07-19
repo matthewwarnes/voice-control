@@ -17,26 +17,17 @@ sudo apt-get install -y libboost-dev libboost-regex-dev youtube-dl axel curl xte
 
 To install PiAUISuite:
 ```bash
-git clone https://github.com/StevenHickson/PiAUISuite.git
-cd PiAUISuite/Install
-./InstallAUISuite.sh
+git clone https://github.com/matthewwarnes/voice-control.git
+cd voice-control
+make
+sudo make install
 ```
 
-It will:
-* ask if you want to install the dependencies
-* to install each script
+Adjust config:
+The commands and hardware config should be in ~/.commands.conf
 
-## Different Parts
-
-Name | Purpose | Blogpost
------|---------|---------
-playvideo | finds and plays videos | [Here](http://stevenhickson.blogspot.com/2013/03/playing-videos-intelligently-with.html)
-downloader | find and downloads the best torrent | [Here](http://stevenhickson.blogspot.com/2013/03/automatically-downloading-torrents-with.html)
-gvapi | checks, sends, and deletes SMS messages | [Here](http://stevenhickson.blogspot.com/2013/05/using-google-voice-c-api.html)
-gtextcommand | checks for sms messages every minute and runs commands from them | [Here](http://stevenhickson.blogspot.com/2013/03/controlling-raspberry-pi-via-text.html)
-youtube | streams youtube | [In browser](http://stevenhickson.blogspot.com/2013/06/playing-youtube-videos-in-browser-on.html) and [on Pi](http://stevenhickson.blogspot.com/2013/04/using-youtube-on-raspberry-pi-without.html)
-youtube-safe | streams other video files | [Hulu and Vimeo](http://stevenhickson.blogspot.com/2013/06/getting-huluvimeo-to-work-on-raspberry.html) and [others](http://stevenhickson.blogspot.com/2013/06/streaming-other-hd-video-sites-on.html)
-voicecommand | run voice commands | [Here](http://stevenhickson.blogspot.com/2013/05/voice-command-v20-for-raspberry-pi.html) and [here](http://stevenhickson.blogspot.com/2013/04/voice-control-on-raspberry-pi.html)
+Run:
+voicecontrol -c
 
 Copyright
 

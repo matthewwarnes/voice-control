@@ -11,7 +11,7 @@ static const char *optString = "I:l:d:D:psb::c::v::ei::q::t:k:r:f:h?";
 inline void ProcessVoice(FILE *cmd, VoiceCommand &vc, char *message) {
     printf("Found audio\n");
     vc.Speak(vc.response);
-    string command = "speech-recog.sh";
+    string command = "./speech-recog.sh";
     if(vc.differentHW) {
         command += " -D ";
         command += vc.recordHW;
@@ -22,6 +22,7 @@ inline void ProcessVoice(FILE *cmd, VoiceCommand &vc, char *message) {
     command += vc.lang;
     cmd = popen(command.c_str(),"r");
     fscanf(cmd,"\"%[^\"\n]\"",message);
+    printf("you said: %s\n", message);
     vc.ProcessMessage(message);
     fclose(cmd);
 }
@@ -37,7 +38,7 @@ inline float GetVolume(string recordHW, string com_duration, bool nullout) {
     if(nullout)
         run += " 1>>/dev/shm/voice.log 2>>/dev/shm/voice.log";
     system(run.c_str());
-    cmd = popen("sox /dev/shm/noise.wav -n stats -s 16 2>&1 | awk '/^Max\\ level/ {print $3}'","r");
+    cmd = popen("sox /dev/shm/noise.wav -n stats -s 16 2>&1 | awk '/^Max level/ {print $3}'","r");
     fscanf(cmd,"%f",&vol);
     fclose(cmd);
     return vol;
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]) {
     //And it allows the config file to be set to something random
     system("echo \"\" > /dev/shm/voice.log"); //lazily clear out the log file
     vc.CheckConfigParam(argc,argv);
-    
+
     FILE *cmd = NULL;
     char message[200];
     message[0] = '\0';
@@ -97,7 +98,7 @@ int main(int argc, char* argv[]) {
                     fscanf(cmd,"\"%[^\"\n]\"",message);
                     fclose(cmd);
                     system("rm -fr /dev/shm/noise.*");
-                    //printf("message: %s, keyword: %s\n", message, vc.keyword.c_str());
+                    printf("message: %s, keyword: %s\n", message, vc.keyword.c_str());
                     if(iequals(message,vc.keyword.c_str())) {
                         message[0] = '\0'; //this will clear the first bit
                         ProcessVoice(cmd,vc,message);
@@ -233,7 +234,7 @@ inline void VoiceCommand::CheckCmdLineParam(int argc, char* argv[]) {
             case 'r':
                 response = string(optarg);
                 break;
-            case 'h': 
+            case 'h':
             case '?':
                 DisplayUsage();
                 break;
@@ -241,7 +242,7 @@ inline void VoiceCommand::CheckCmdLineParam(int argc, char* argv[]) {
                 break;
         }
         opt = getopt( argc, argv, optString );
-    }    
+    }
 }
 
 void VoiceCommand::DisplayUsage() {
@@ -323,7 +324,7 @@ inline void VoiceCommand::ProcessMessage(const char* message) {
 	    string v = voice[i].substr(1, string::npos);
 	    loc = sTmp.find(v);
 	    //printf("v: %s\tloc: %d\tsTmp: %s\n",v.c_str(),loc,sTmp.c_str());
-	    if( loc != string::npos && loc != -1) {				
+	    if( loc != string::npos && loc != -1) {
 	        // if it does, return
                 if(passthrough)
                     printf("%s",commands[i].c_str());
@@ -332,7 +333,7 @@ inline void VoiceCommand::ProcessMessage(const char* message) {
 		    system(commands[i].c_str());
                 }
 		return;
-	    }				
+	    }
 	} else {
             regex rexp("\\$(\\d+)"); cmatch m;
             if(regex_search(voice[i].c_str(), m, rexp)) {
@@ -383,7 +384,7 @@ inline void VoiceCommand::ProcessMessage(const char* message) {
     } else if(!passthrough) {
         printf("No translation\n");
         Speak("No translation");
-    } 
+    }
 }
 
 void VoiceCommand::GetConfig() {
@@ -659,7 +660,7 @@ int VoiceCommand::Search(const char* search) {
 		                }
 		            }
 	            }
-            }	
+            }
 	        if (result.empty()) {
 	            BOOST_FOREACH( ptree::value_type const& v, pt.get_child("queryresult") ) {
 		            if (v.first == "didyoumeans") {
@@ -680,7 +681,7 @@ int VoiceCommand::Search(const char* search) {
             regex rexp("<plaintext>([^<].+?)</plaintext>");
             smatch m;
             string::const_iterator endbuf = curlbuf.end();
-            if (regex_search(curlbuf, m, rexp) 
+            if (regex_search(curlbuf, m, rexp)
         && regex_search(m[1].second, endbuf, m, rexp)) {
                 //char * curlrep = curl_easy_unescape(hcurl, m.str(1).c_str(), 0, NULL);
                 //string t = string(curlrep);
@@ -710,7 +711,7 @@ int VoiceCommand::Search(const char* search) {
 void changemode(int dir)
 {
   static struct termios oldt, newt;
- 
+
   if ( dir == 1 )
   {
     tcgetattr( STDIN_FILENO, &oldt);
@@ -721,21 +722,21 @@ void changemode(int dir)
   else
     tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
 }
- 
+
 int kbhit (void)
 {
   struct timeval tv;
   fd_set rdfs;
- 
+
   tv.tv_sec = 0;
   tv.tv_usec = 0;
- 
+
   FD_ZERO(&rdfs);
   FD_SET (STDIN_FILENO, &rdfs);
- 
+
   select(STDIN_FILENO+1, &rdfs, NULL, NULL, &tv);
   return FD_ISSET(STDIN_FILENO, &rdfs);
- 
+
 }
 
 void VoiceCommand::Setup() {
@@ -863,7 +864,7 @@ void VoiceCommand::Setup() {
             write += "\n";
         }
     }
-    
+
     //Now we will check some more options and check the TTS and speech recognition
     printf("Do you want to set up and check the speech recognition options? (y/n)\n");
     scanf("%s",buffer);
@@ -893,7 +894,7 @@ void VoiceCommand::Setup() {
                 write += recordHW;
                 write += "\n";
             }
-        } else 
+        } else
             printf("Everything seems right with the hardware config\n");
         printf("\nWould you like me to try to get the proper audio threshold? (y/n)\n");
         scanf("%s",buffer);
@@ -943,7 +944,7 @@ void VoiceCommand::Setup() {
                 command += " -d ";
                 command += duration;
                 cmd = popen(command.c_str(),"r");
-                fscanf(cmd,"\"%[^\"\n]\"\n",message); 
+                fscanf(cmd,"\"%[^\"\n]\"\n",message);
                 if(iequals(message,keyword.c_str()))
                     printf("I got %s, which was a perfect match!\n",message);
                 else
